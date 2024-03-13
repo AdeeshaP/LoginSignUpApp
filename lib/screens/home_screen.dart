@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:login_register_app/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.name});
+  const HomeScreen({super.key, required this.email});
 
-  final String name;
+  final String email;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Center(
         child: Text(
-          widget.name,
+          widget.email,
           style: TextStyle(
             fontSize: 22,
             color: Colors.black,

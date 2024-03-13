@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:login_register_app/screens/home_screen.dart';
 import 'package:login_register_app/screens/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,6 +26,35 @@ class _LoginScreenState extends State<LoginScreen> {
     _mailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void userSignin() async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(email: _mailController.text),
+          ));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.orangeAccent,
+            content: Text(
+              "No User Found for that Email",
+              style: TextStyle(fontSize: 18.0),
+            )));
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.orangeAccent,
+          content: Text(
+            "Password is incorrect.",
+            style: TextStyle(fontSize: 18.0),
+          ),
+        ));
+      }
+    }
   }
 
   @override
@@ -105,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             password = _passwordController.text;
                           });
                         }
+                        userSignin();
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width,
@@ -128,9 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20.0,
-            ),
+            SizedBox(height: 20.0),
             GestureDetector(
               onTap: () {},
               child: Text("Forgot Password?",
@@ -139,19 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 18.0,
                       fontWeight: FontWeight.w500)),
             ),
-            SizedBox(
-              height: 40.0,
-            ),
-            Text(
-              "Or",
-              style: TextStyle(
-                  color: Color(0xFF273671),
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.w500),
-            ),
-            SizedBox(
-              height: 30.0,
-            ),
+            SizedBox(height: 30.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -171,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   },
                   child: Text(
-                    "SignUp",
+                    "Sign Up",
                     style: TextStyle(
                         color: Color(0xFF273671),
                         fontSize: 20.0,

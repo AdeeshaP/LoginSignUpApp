@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:login_register_app/screens/home_screen.dart';
 import 'package:login_register_app/screens/login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -26,6 +28,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void userSignup() async {
+    if (_usernameController.text != "" && _passwordController.text != "") {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "Registered Successfully",
+          style: TextStyle(fontSize: 20.0),
+        )));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                email: _mailController.text,
+              ),
+            ));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Colors.orangeAccent,
+              content: Text(
+                "Password Provided is too weak",
+                style: TextStyle(fontSize: 18.0),
+              )));
+        } else if (e.code == "email-already-in-use") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.orangeAccent,
+              content: Text(
+                "Account Already exists",
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -132,6 +174,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               password = _passwordController.text;
                             });
                           }
+                          userSignup();
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width,
